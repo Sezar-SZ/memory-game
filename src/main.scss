@@ -1,0 +1,14 @@
+$primary: rgb(125, 25, 125);
+$secondary: rgb(145, 255, 145);
+
+$custom-colors: (
+    "dark-bg": #334033,
+);
+
+$theme-colors: (
+    "primary": $primary,
+);
+
+$theme-colors: map-merge($theme-colors, $custom-colors);
+
+@import "../node_modules/bootstrap/scss/bootstrap";
