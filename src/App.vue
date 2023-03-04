@@ -117,6 +117,10 @@ function gameIsOver(cards: Ref<Card[]>) {
 .cardsContainer {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
+
+    @media (max-width: 420px) {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
 .card {
@@ -134,6 +138,10 @@ function gameIsOver(cards: Ref<Card[]>) {
         position: absolute;
         font-size: 7vmin;
         user-select: none;
+    }
+
+    @media (max-width: 420px) {
+        margin: 2vh 4vw;
     }
 }
 .cardFolded {
