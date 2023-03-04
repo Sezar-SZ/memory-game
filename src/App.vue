@@ -23,7 +23,7 @@ function createMap(cardsImages: string[]) {
 
 onMounted(() => {
     cards.value = createMap(cardsImages);
-    highScore.value = +localStorage.getItem('highScore') || null;
+    highScore.value = Number(localStorage.getItem('highScore')) || null;
 });
 
 let activeCardIndices: number[] = [];
@@ -100,7 +100,7 @@ function gameIsOver(cards: Ref<Card[]>) {
                     <span class="main">
                         {{ gameDuration }}
                     </span>
-                    <span class="highScore">Your best time is {{ formatTime(highScore) }}</span>
+                    <span class="highScore">Your best time is {{ formatTime(highScore!) }}</span>
                 </div>
             </div>
         </Transition>

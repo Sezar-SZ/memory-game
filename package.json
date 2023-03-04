@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host=192.168.31.31",
     "build": "run-p type-check build-only",
     "build-sass": "sass --watch ./src/main.scss ./public/css/main.css",
     "preview": "vite preview",
