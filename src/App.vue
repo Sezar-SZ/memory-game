@@ -22,7 +22,7 @@ const cards = ref<Card[]>([]);
 const gameDuration = ref('');
 
 const userData: { username: string | null; bestTime: number | null } = reactive({
-    username: null,
+    username: 'efef',
     bestTime: null,
 });
 const userTempData: { username: string | null; time: number | null } = reactive({
@@ -188,14 +188,14 @@ function gameIsOver(cards: Ref<Card[]>) {
     align-items: center;
 
     span {
-        font-size: clamp(12px, 5vmin, 80px);
+        font-size: clamp(12px, 5vmin, 45px);
         color: white;
     }
     .leaderboardContainer {
         cursor: pointer;
         img {
             filter: invert(100%);
-            width: clamp(16px, 6vmin, 80px);
+            width: clamp(16px, 6vmin, 50px);
         }
     }
 }
