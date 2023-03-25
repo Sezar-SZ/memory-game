@@ -1,31 +1,38 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch, type Ref } from 'vue';
-import { AxiosError, isAxiosError } from 'axios';
+import { onMounted, reactive, ref, type Ref } from 'vue';
+import { isAxiosError } from 'axios';
 import axiosInstance from './axiosInstance';
 import './global.css';
 
-import Modal from './components/Modal.vue';
+import LeaderboardModal from './components/LeaderboardModal.vue';
 
 import { formatTime, shuffleArray } from './utils';
-import type { GetUserData } from './types/api';
+import type { PlayerData } from './types/api';
 
 interface Card {
     emoji: string;
     isFolded: boolean;
 }
+
 let dingSound = new Audio('/ding.mp3');
 
 const cardsImages = ['🐱', '🌷', '🍕', '🍔', '🔥', '☀', '🎯', '😎', '🍉', '🌳'];
 
 const cards = ref<Card[]>([]);
 const gameDuration = ref('');
+
 const userData: { username: string | null; bestTime: number | null } = reactive({
-    username: 'yes',
-    bestTime: 100,
+    username: null,
+    bestTime: null,
 });
+const userTempData: { username: string | null; time: number | null } = reactive({
+    username: null,
+    time: null,
+});
+
 const error = ref<boolean>(false);
 
-const isShowingModal = ref<boolean>(false);
+const isShowingModal = ref<null | 'leaderboard' | 'nameInput'>(null);
 
 function createMap(cardsImages: string[]) {
     const cards = shuffleArray([...cardsImages, ...cardsImages]);
@@ -41,10 +48,9 @@ onMounted(async () => {
 
 async function getBestTime() {
     try {
-        const response = await axiosInstance.get<GetUserData>('/');
+        const response = await axiosInstance.get<PlayerData>('/');
         userData.username = response.data.username;
         userData.bestTime = response.data.score;
-        console.log(response.data);
     } catch (err: unknown) {
         if (isAxiosError<{ error: string }>(err) && err.response) {
             if (err.response.status === 401) {
@@ -60,11 +66,24 @@ async function getBestTime() {
     }
 }
 
+async function setScore() {
+    try {
+        const response = await axiosInstance.post<PlayerData>('/', {
+            username: userTempData.username,
+            score: userTempData.time,
+        });
+        userData.username = response.data.username;
+        userData.bestTime = response.data.score;
+    } catch (error) {
+        console.log('Something Went Wrong');
+    }
+}
+
 let activeCardIndices: number[] = [];
 
 let timeStart = 0;
 
-function onCardClick(cardIndex: number) {
+async function onCardClick(cardIndex: number) {
     if (!timeStart) timeStart = Date.now();
     if (activeCardIndices.includes(cardIndex)) return;
     if (activeCardIndices.length === 2) {
@@ -86,8 +105,8 @@ function onCardClick(cardIndex: number) {
     if (gameIsOver(cards)) {
         const time = Math.ceil((Date.now() - timeStart) / 1000);
         gameDuration.value = formatTime(time);
-        if (!bestTime.value || time < bestTime.value) bestTime.value = time;
-        localStorage.setItem('highScore', bestTime.value.toString());
+        userTempData.time = time;
+        await setScore();
         setTimeout(() => {
             location.reload();
         }, 3000);
@@ -121,7 +140,7 @@ function gameIsOver(cards: Ref<Card[]>) {
             <div class="scoreContainer">
                 <span>{{ userData.bestTime }}</span>
             </div>
-            <div class="leaderboardContainer" @click="isShowingModal = true">
+            <div class="leaderboardContainer" @click="isShowingModal = 'leaderboard'">
                 <img src="/chart.svg" />
             </div>
         </div>
@@ -145,12 +164,12 @@ function gameIsOver(cards: Ref<Card[]>) {
                     <span class="main">
                         {{ gameDuration }}
                     </span>
-                    <span class="highScore">Your best time is {{ formatTime(bestTime!) }}</span>
+                    <!-- <span class="highScore">Your best time is {{ formatTime(bestTime!) }}</span> -->
                 </div>
             </div>
         </Transition>
     </div>
-    <Modal v-if="isShowingModal" @modalClose="isShowingModal = false" />
+    <LeaderboardModal v-if="isShowingModal" @modalClose="isShowingModal = null" />
 </template>
 
 <style scoped lang="scss">
@@ -176,7 +195,7 @@ function gameIsOver(cards: Ref<Card[]>) {
         cursor: pointer;
         img {
             filter: invert(100%);
-            width: clamp(16px, 7vmin, 80px);
+            width: clamp(16px, 6vmin, 80px);
         }
     }
 }
