@@ -5,6 +5,7 @@ import axiosInstance from './axiosInstance';
 import './global.css';
 
 import LeaderboardModal from './components/LeaderboardModal.vue';
+import NameInputModal from './components/NameInputModal.vue';
 
 import { formatTime, shuffleArray } from './utils';
 import type { PlayerData } from './types/api';
@@ -169,7 +170,8 @@ function gameIsOver(cards: Ref<Card[]>) {
             </div>
         </Transition>
     </div>
-    <LeaderboardModal v-if="isShowingModal" @modalClose="isShowingModal = null" />
+    <LeaderboardModal v-if="isShowingModal === 'leaderboard'" @modalClose="isShowingModal = null" />
+    <NameInputModal v-if="isShowingModal === 'nameInput'" />
 </template>
 
 <style scoped lang="scss">
